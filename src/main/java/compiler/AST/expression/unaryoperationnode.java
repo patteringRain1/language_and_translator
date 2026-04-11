@@ -1,6 +1,7 @@
 package compiler.AST.expression;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Semantic.SymbolTable;
 
 // for binary operation expression
 public class unaryoperationnode extends ASTnode {
@@ -23,4 +24,8 @@ public class unaryoperationnode extends ASTnode {
         }
     }
 
+    @Override
+    public String checkSemantics(SymbolTable table) {
+        return null;
+    }
 }

@@ -5,6 +5,7 @@ import compiler.Lexer.Symbol;
 import compiler.Lexer.TokenType;
 import compiler.Parser.Parser;
 import compiler.AST.basic.ProgramNode;
+import compiler.Semantic.SymbolTable;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -35,7 +36,10 @@ public class Compiler {
             } else if (mode.equals("-parser")) {
                 Parser parser = new Parser(lexer);
                 ProgramNode root = parser.getAST();
+                SymbolTable table = new SymbolTable();
+                root.checkSemantics(table);
                 root.print(0);
+                System.out.println("Semantic Analysis complete with success !");
             }
 
         } catch (IOException e) {

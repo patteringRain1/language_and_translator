@@ -1,6 +1,7 @@
 package compiler.AST.executestatement;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Semantic.SymbolTable;
 
 // for return statement of a function
 public class returnnode extends ASTnode {
@@ -17,5 +18,20 @@ public class returnnode extends ASTnode {
         if(value != null) {
             value.print(indent + 1);
         }
+    }
+
+    @Override
+    public String checkSemantics(SymbolTable table) {
+        String expectedType = table.getCurrentReturnType();
+        String actualType = "void";
+
+        if (this.value != null){
+            actualType = this.value.checkSemantics(table);
+        }
+
+        if (!actualType.equalsIgnoreCase(expectedType)) {
+            SymbolTable.crash("returnError", "waiting for a returntype of " + expectedType + " but received " + actualType);
+        }
+        return "void";
     }
 }

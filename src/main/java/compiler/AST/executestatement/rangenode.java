@@ -1,6 +1,7 @@
 package compiler.AST.executestatement;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Semantic.SymbolTable;
 
 public class rangenode extends ASTnode {
   private ASTnode start;
@@ -16,5 +17,16 @@ public class rangenode extends ASTnode {
     System.out.println(getIndent(indent) + "range");
     start.print(indent + 1);
     end.print(indent + 1);
+  }
+
+  @Override
+  public String checkSemantics(SymbolTable table) {
+    table.enterScope();
+
+    this.start.checkSemantics(table);
+    this.end.checkSemantics(table);
+
+    table.exitScope();
+    return "void";
   }
 }

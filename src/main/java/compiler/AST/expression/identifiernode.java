@@ -1,6 +1,7 @@
 package compiler.AST.expression;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Semantic.SymbolTable;
 
 public class identifiernode extends ASTnode {
     // the name of identifier
@@ -16,4 +17,8 @@ public class identifiernode extends ASTnode {
         System.out.println(getIndent(indent) + "Identifier, " + name);
     }
 
+    @Override
+    public String checkSemantics(SymbolTable table) {
+        return table.giveVariableType(this.name);
+    }
 }

@@ -1,6 +1,7 @@
 package compiler.AST.declaration;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Semantic.SymbolTable;
 import java.util.List;
 
 // for the declaration of function
@@ -35,4 +36,8 @@ public class functiondeclarationnode extends ASTnode {
         }
     }
 
+    @Override
+    public String checkSemantics(SymbolTable table) {
+        return null;
+    }
 }

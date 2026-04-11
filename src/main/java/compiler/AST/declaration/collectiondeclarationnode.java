@@ -1,6 +1,7 @@
 package compiler.AST.declaration;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Semantic.SymbolTable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,5 +29,15 @@ public class collectiondeclarationnode extends ASTnode {
             ASTnode field = fields.get(i);
             field.print(indent + 1);
         }
+    }
+
+    @Override
+    public String checkSemantics(SymbolTable table) {
+        if (!Character.isUpperCase(this.name.charAt(0))) {
+            SymbolTable.crash("collectionError", "the name of collections " + this.name + " must start with a uppercase");
+        }
+
+        table.declareCollection(this.name, this.fields);
+        return "void";
     }
 }

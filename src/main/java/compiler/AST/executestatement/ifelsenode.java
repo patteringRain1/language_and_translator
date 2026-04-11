@@ -1,6 +1,8 @@
 package compiler.AST.executestatement;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Lexer.Symbol;
+import compiler.Semantic.SymbolTable;
 
 public class ifelsenode extends ASTnode {
     // condition
@@ -31,5 +33,25 @@ public class ifelsenode extends ASTnode {
             System.out.println(getIndent(indent) + "else");
             elseblock.print(indent + 1);
         }
+    }
+
+    @Override
+    public String checkSemantics(SymbolTable table) {
+        String condType = condition.checkSemantics(table);
+
+        if (!condType.equals("BOOL")) {
+            SymbolTable.crash("noConditionError", "condition of IF needs to be BOOL but received : " + condType);
+        }
+
+        table.enterScope();
+        ifblock.checkSemantics(table);
+        table.exitScope();
+
+        if (elseblock != null) {
+            table.enterScope();
+            elseblock.checkSemantics(table);
+            table.exitScope();
+        }
+        return "VOID";
     }
 }

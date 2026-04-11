@@ -1,6 +1,7 @@
 package compiler.AST.executestatement;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Semantic.SymbolTable;
 
 // // for "for" loop statement
 public class fornode extends ASTnode {
@@ -36,5 +37,17 @@ public class fornode extends ASTnode {
         if(body != null) {
             body.print(indent + 1);
         }
+    }
+
+    @Override
+    public String checkSemantics(SymbolTable table) {
+        table.enterScope();
+        this.initialization.checkSemantics(table);
+        this.condition.checkSemantics(table);
+        this.step_part.checkSemantics(table);
+        this.body.checkSemantics(table);
+
+        table.exitScope();
+        return "void";
     }
 }

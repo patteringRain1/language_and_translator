@@ -1,6 +1,7 @@
 package compiler.AST.expression;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Semantic.SymbolTable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,5 +32,10 @@ public class functioncallnode extends ASTnode {
                 arg.print(indent + 1);
             }
         }
+    }
+
+    @Override
+    public String checkSemantics(SymbolTable table) {
+        return null;
     }
 }

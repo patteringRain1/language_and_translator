@@ -1,6 +1,7 @@
 package compiler.AST.executestatement;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Semantic.SymbolTable;
 
 // assignmenr statement
 public class assignmentnode extends ASTnode {
@@ -23,5 +24,16 @@ public class assignmentnode extends ASTnode {
         if(value != null){
             value.print(indent + 1);
         }
+    }
+
+    @Override
+    public String checkSemantics(SymbolTable table) {
+        String targetType = target.checkSemantics(table);
+        String valueType = value.checkSemantics(table);
+
+        if (!targetType.equalsIgnoreCase(valueType)) {
+            SymbolTable.crash("typeError", "the target has type of " + targetType + " but assigned with " + valueType);
+        }
+        return "void";
     }
 }

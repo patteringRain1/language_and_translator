@@ -1,6 +1,8 @@
 package compiler.AST.declaration;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Lexer.Symbol;
+import compiler.Semantic.SymbolTable;
 
 // for declaration of variable
 public class vardeclarationnode extends ASTnode {
@@ -29,5 +31,18 @@ public class vardeclarationnode extends ASTnode {
         if (initialvalue != null) {
             initialvalue.print(indent + 1);
         }
+    }
+
+    @Override
+    public String checkSemantics(SymbolTable table) {
+        table.declareVariable(this.name, this.type);
+
+        if (this.initialvalue != null) {
+            String typeValue = initialvalue.checkSemantics(table);
+            if (!this.type.equalsIgnoreCase(typeValue)) {
+                SymbolTable.crash("TypeError", "variable " + name + "has type " + this.type + " but assigned with " + typeValue);
+            }
+        }
+        return "void";
     }
 }

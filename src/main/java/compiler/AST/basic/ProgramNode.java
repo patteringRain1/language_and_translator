@@ -1,6 +1,7 @@
 package compiler.AST.basic;
 
 
+import compiler.Semantic.SymbolTable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,5 +20,13 @@ public class ProgramNode extends ASTnode {
             ASTnode node = declarations.get(i);
             node.print(indent + 1);
         }
+    }
+
+    @Override
+    public String checkSemantics(SymbolTable table) {
+        for (ASTnode declaration : declarations) {
+            declaration.checkSemantics(table);
+        }
+        return "VOID";
     }
 }

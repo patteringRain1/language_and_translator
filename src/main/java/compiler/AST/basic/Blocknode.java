@@ -1,5 +1,6 @@
 package compiler.AST.basic;
 
+import compiler.Semantic.SymbolTable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,5 +21,10 @@ public class Blocknode extends ASTnode {
             ASTnode statement = statements.get(i);
             statement.print(indent + 1);
         }
+    }
+
+    @Override
+    public String checkSemantics(SymbolTable table) {
+        return null;
     }
 }
