@@ -29,8 +29,8 @@ public class returnnode extends ASTnode {
             actualType = this.value.checkSemantics(table);
         }
 
-        if (!actualType.equalsIgnoreCase(expectedType)) {
-            SymbolTable.crash("returnError", "waiting for a returntype of " + expectedType + " but received " + actualType);
+        if (!SymbolTable.typesAreCompatible(expectedType, actualType)) {
+            SymbolTable.crash("ReturnError", "waiting for a return type of " + expectedType + " but received " + actualType);
         }
         return "void";
     }

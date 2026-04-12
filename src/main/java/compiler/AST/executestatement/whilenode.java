@@ -30,8 +30,8 @@ public class whilenode extends ASTnode {
     @Override
     public String checkSemantics(SymbolTable table) {
         String condType = this.condition.checkSemantics(table);
-        if (!condType.equalsIgnoreCase("bool")) {
-            SymbolTable.crash("noConditionError", "the condition of a while must be a bool but received : " + condType);
+        if (condType == null || !condType.equalsIgnoreCase("bool")) {
+            SymbolTable.crash("MissingConditionError", "the condition of a while must be a bool but received : " + condType);
         }
         table.enterScope();
         this.body.checkSemantics(table);

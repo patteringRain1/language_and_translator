@@ -35,11 +35,13 @@ public class vardeclarationnode extends ASTnode {
 
     @Override
     public String checkSemantics(SymbolTable table) {
-        table.declareVariable(this.name, this.type);
+        if (!this.type.equals("existing_var")) {
+            table.declareVariable(this.name, this.type);
+        }
 
         if (this.initialvalue != null) {
             String typeValue = initialvalue.checkSemantics(table);
-            if (!this.type.equalsIgnoreCase(typeValue)) {
+            if (!SymbolTable.typesAreCompatible(this.type, typeValue)) {
                 SymbolTable.crash("TypeError", "variable " + name + "has type " + this.type + " but assigned with " + typeValue);
             }
         }

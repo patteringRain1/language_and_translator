@@ -32,13 +32,27 @@ public class binaryoperationnode extends ASTnode {
             operator.equals("DIVIDE") || operator.equals("/") ||
             operator.equals("MODULO") || operator.equals("%")) {
 
-            if (!leftType.equalsIgnoreCase(rightType)) {
-                SymbolTable.crash("OperatorError", leftType + " ne peut pas operer avec " + rightType);
+            if (!SymbolTable.typesAreCompatible(leftType, rightType)) {
+                SymbolTable.crash("OperatorError",
+                        leftType + " cannot operate with " + rightType);
             }
-            if (!leftType.equalsIgnoreCase("int") && !leftType.equalsIgnoreCase("float")) {
-                SymbolTable.crash("OperatorError", leftType + " n'est pas un nombre.");
+            //"+" is legal for String, other operators are not
+            boolean isPlus = operator.equals("PLUS") || operator.equals("+");
+            if (!isPlus) {
+                if (!SymbolTable.typesAreCompatible(leftType, "int")
+                        && !SymbolTable.typesAreCompatible(leftType, "float")) {
+                    SymbolTable.crash("OperatorError",
+                            leftType + " is not a number.");
+                }
+            } else {
+                if (!SymbolTable.typesAreCompatible(leftType, "int")
+                        && !SymbolTable.typesAreCompatible(leftType, "float")
+                        && !SymbolTable.typesAreCompatible(leftType, "string")) {
+                    SymbolTable.crash("OperatorError",
+                            leftType + " does not support + operator.");
+                }
             }
-            return leftType;
+            return leftType != null ? leftType : "void";
         }
 
         if (operator.equals("EQUALS") || operator.equals("==") ||
@@ -48,7 +62,7 @@ public class binaryoperationnode extends ASTnode {
             operator.equals("GREATER_THAN") || operator.equals(">") ||
             operator.equals("GREATER_THAN_OR_EQUALS") || operator.equals(">=")) {
 
-            if (!leftType.equalsIgnoreCase(rightType)) {
+            if (!SymbolTable.typesAreCompatible(leftType, rightType)) {
                 SymbolTable.crash("OperatorError", "Comparaison impossible entre " + leftType + " et " + rightType);
             }
             return "bool";
@@ -57,13 +71,12 @@ public class binaryoperationnode extends ASTnode {
         if (operator.equals("AND") || operator.equals("&&") ||
             operator.equals("OR") || operator.equals("||")) {
 
-            if (!leftType.equalsIgnoreCase("bool") || !rightType.equalsIgnoreCase("bool")) {
-                SymbolTable.crash("OperatorError", "Les operateurs logiques attendent des bool.");
+            if (!SymbolTable.typesAreCompatible(leftType, "bool") || !SymbolTable.typesAreCompatible(rightType, "bool")) {
+                SymbolTable.crash("OperatorError", "logical operators require bool.");
             }
             return "bool";
         }
 
-        System.out.println(">>> FATAL DEBUG: Opérateur inconnu -> [" + operator + "]");
         return "void";
     }
 }

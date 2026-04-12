@@ -27,6 +27,6 @@ public class ProgramNode extends ASTnode {
         for (ASTnode declaration : declarations) {
             declaration.checkSemantics(table);
         }
-        return "VOID";
+        return "void";
     }
 }

@@ -31,8 +31,8 @@ public class assignmentnode extends ASTnode {
         String targetType = target.checkSemantics(table);
         String valueType = value.checkSemantics(table);
 
-        if (!targetType.equalsIgnoreCase(valueType)) {
-            SymbolTable.crash("typeError", "the target has type of " + targetType + " but assigned with " + valueType);
+        if (!SymbolTable.typesAreCompatible(targetType, valueType)) {
+            SymbolTable.crash("TypeError", "the target has type of " + targetType + " but assigned with " + valueType);
         }
         return "void";
     }

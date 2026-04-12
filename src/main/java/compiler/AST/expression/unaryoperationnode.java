@@ -26,6 +26,24 @@ public class unaryoperationnode extends ASTnode {
 
     @Override
     public String checkSemantics(SymbolTable table) {
-        return null;
+        if (expression == null) return "void";
+        String exprType = expression.checkSemantics(table);
+
+        if (operator.equals("MINUS") || operator.equals("-")) {
+            if (!SymbolTable.typesAreCompatible(exprType, "int")
+                    && !SymbolTable.typesAreCompatible(exprType, "float")) {
+                SymbolTable.crash("OperatorError",
+                        "unary minus requires int or float but received: " + exprType);
+            }
+            return exprType != null ? exprType : "void";
+        }
+        if (operator.equals("NOT") || operator.equals("not")) {
+            if (!SymbolTable.typesAreCompatible(exprType, "bool")) {
+                SymbolTable.crash("OperatorError",
+                        "unary not requires bool but received: " + exprType);
+            }
+            return "bool";
+        }
+        return exprType != null ? exprType : "void";
     }
 }

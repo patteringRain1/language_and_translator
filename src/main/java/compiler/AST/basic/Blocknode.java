@@ -25,6 +25,13 @@ public class Blocknode extends ASTnode {
 
     @Override
     public String checkSemantics(SymbolTable table) {
-        return null;
+        table.enterScope();
+        for (ASTnode statement : statements) {
+            if (statement != null) {
+                statement.checkSemantics(table);
+            }
+        }
+        table.exitScope();
+        return "void";
     }
 }

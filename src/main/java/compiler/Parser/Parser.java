@@ -111,7 +111,7 @@ public class Parser {
     ASTnode left = parseFactor();
 
     while (currentSymbol.getType() == TokenType.TIMES || currentSymbol.getType() == TokenType.DIVIDE || currentSymbol.getType() == TokenType.MODULO) {
-      String operation = (String) currentSymbol.getValue();
+      String operation = currentSymbol.getValue() != null ? (String) currentSymbol.getValue() : currentSymbol.getType().toString();
       TokenType type = currentSymbol.getType();
       consume(type);
 
@@ -125,7 +125,7 @@ public class Parser {
     ASTnode left = parseTerm();
 
     while (currentSymbol.getType() == TokenType.PLUS || currentSymbol.getType() == TokenType.MINUS) {
-      String operation = (String) currentSymbol.getValue();
+      String operation = currentSymbol.getValue() != null ? (String) currentSymbol.getValue() : currentSymbol.getType().toString();
       TokenType type = currentSymbol.getType();
       consume(type);
 
@@ -158,7 +158,6 @@ public class Parser {
       consume(TokenType.RIGHT_BRACKET);
       typeName += "[]";
     }
-
     return typeName;
   }
 
@@ -222,35 +221,12 @@ public class Parser {
     return node;
   }
 
-  private List<String> parseParameters() {
-    List<String> params = new ArrayList<>();
-    consume(TokenType.LEFT_PAREN);
-
-    if (currentSymbol.getType() != TokenType.RIGHT_PAREN) {
-      do {
-        parseType();
-
-        String paramName = (String) currentSymbol.getValue();
-        consume(TokenType.IDENTIFIER);
-        params.add(paramName);
-
-        if (currentSymbol.getType() == TokenType.COMMA) {
-          consume(TokenType.COMMA);
-        } else {
-          break;
-        }
-      } while (true);
-    }
-    consume(TokenType.RIGHT_PAREN);
-    return params;
-  }
 
   private Blocknode parseBlock(){
     Blocknode block = new Blocknode();
     consume(TokenType.LEFT_BRACE);
 
     while (currentSymbol.getType() != TokenType.RIGHT_BRACE && currentSymbol.getType() != TokenType.EOF) {
-      System.out.println("BLOCK LOOP TOKEN: " + currentSymbol.getType() + " " + currentSymbol.getValue());
       block.addstatement(parseStatement());
     }
 
@@ -264,26 +240,41 @@ public class Parser {
     String returnType;
     String funcName;
 
-    if (nextSymbol.getType() == TokenType.LEFT_PAREN) {
+    if (currentSymbol.getType() == TokenType.IDENTIFIER && nextSymbol.getType() == TokenType.LEFT_PAREN) {
       returnType = "void";
-      funcName = (String) currentSymbol.getValue();
-      consume(TokenType.IDENTIFIER);
     } else {
       returnType = parseType();
-      funcName = (String) currentSymbol.getValue();
-      consume(TokenType.IDENTIFIER);
     }
+    funcName = (String) currentSymbol.getValue();
+    consume(TokenType.IDENTIFIER);
 
-    List<String> params = parseParameters();
+    List<String> paramTypes = new ArrayList<>();
+    List<String> paramNames = new ArrayList<>();
+
+    consume(TokenType.LEFT_PAREN);
+    if (currentSymbol.getType() != TokenType.RIGHT_PAREN) {
+      while (true) {
+        String pType = parseType();
+        paramTypes.add(pType);
+
+        String pName = (String) currentSymbol.getValue();
+        consume(TokenType.IDENTIFIER);
+        paramNames.add(pName);
+
+        if (currentSymbol.getType() == TokenType.COMMA) {
+          consume(TokenType.COMMA);
+        } else {
+          break;
+        }
+      }
+    }
+    consume(TokenType.RIGHT_PAREN);
     Blocknode body = parseBlock();
-    return new functiondeclarationnode(funcName, params, body);
+    return new functiondeclarationnode(returnType, funcName, paramTypes, paramNames, body);
   }
 
 
   private ASTnode parseStatement() {
-    System.out.println("DEBUG: current=" + currentSymbol.getType() +
-        " next=" + nextSymbol.getType() +
-        " value=" + currentSymbol.getValue());
     TokenType type = currentSymbol.getType();
 
     if (type == TokenType.FOR) { return parseForStatement(); }
@@ -464,7 +455,7 @@ public class Parser {
         break;
       }
 
-      String op = (String) currentSymbol.getValue();
+      String op = currentSymbol.getValue() != null ? (String) currentSymbol.getValue() : currentSymbol.getType().toString();
       if (op == null) op = currentSymbol.getType().toString();
       consume(currentSymbol.getType());
 
@@ -478,7 +469,7 @@ public class Parser {
     ASTnode left = parseComparison();
 
     while (currentSymbol.getType() == TokenType.AND || currentSymbol.getType() == TokenType.OR) {
-      String op = (String) currentSymbol.getValue();
+      String op = currentSymbol.getValue() != null ? (String) currentSymbol.getValue() : currentSymbol.getType().toString();
       consume(currentSymbol.getType());
 
       ASTnode right = parseComparison();

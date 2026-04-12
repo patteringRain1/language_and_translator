@@ -21,12 +21,10 @@ public class rangenode extends ASTnode {
 
   @Override
   public String checkSemantics(SymbolTable table) {
-    table.enterScope();
 
     this.start.checkSemantics(table);
     this.end.checkSemantics(table);
-
-    table.exitScope();
     return "void";
+
   }
 }

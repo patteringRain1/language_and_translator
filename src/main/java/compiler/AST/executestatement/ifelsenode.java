@@ -39,8 +39,8 @@ public class ifelsenode extends ASTnode {
     public String checkSemantics(SymbolTable table) {
         String condType = condition.checkSemantics(table);
 
-        if (!condType.equals("BOOL")) {
-            SymbolTable.crash("noConditionError", "condition of IF needs to be BOOL but received : " + condType);
+        if (condType == null || !condType.equalsIgnoreCase("bool")) {
+            SymbolTable.crash("MissingConditionError", "condition of IF needs to be BOOL but received : " + condType);
         }
 
         table.enterScope();
@@ -52,6 +52,6 @@ public class ifelsenode extends ASTnode {
             elseblock.checkSemantics(table);
             table.exitScope();
         }
-        return "VOID";
+        return "void";
     }
 }

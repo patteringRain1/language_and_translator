@@ -41,13 +41,12 @@ public class fornode extends ASTnode {
 
     @Override
     public String checkSemantics(SymbolTable table) {
-        table.enterScope();
+
         this.initialization.checkSemantics(table);
         this.condition.checkSemantics(table);
         this.step_part.checkSemantics(table);
         this.body.checkSemantics(table);
 
-        table.exitScope();
         return "void";
     }
 }

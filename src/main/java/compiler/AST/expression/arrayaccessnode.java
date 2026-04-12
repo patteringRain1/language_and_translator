@@ -24,20 +24,33 @@ public class arrayaccessnode extends ASTnode {
         }
     }
 
+    // let it return correct format
+    @Override
+    public String toString() {
+        return this.arrayname + "[" + this.indexexpression.toString() + "]";
+    }
+
     @Override
     public String checkSemantics(SymbolTable table) {
+        if (arrayname.equalsIgnoreCase("int") || arrayname.equalsIgnoreCase("float")
+                || arrayname.equalsIgnoreCase("string") || arrayname.equalsIgnoreCase("bool")) {
+            if (indexexpression != null) {
+                indexexpression.checkSemantics(table);
+            }
+            return arrayname.toLowerCase() + "[]";
+        }
         String arrayType = table.giveVariableType(this.arrayname);
 
         String indexType = this.indexexpression.checkSemantics(table);
-        if (!indexType.equalsIgnoreCase("int")) {
-            SymbolTable.crash("OperatorError", "L'index d'un tableau doit être un int, reçu : " + indexType);
+        if (!SymbolTable.typesAreCompatible(indexType, "int")) {
+            SymbolTable.crash("OperatorError", "array index must be int but received: " + indexType);
         }
 
         if (arrayType != null && arrayType.endsWith("[]")) {
             return arrayType.replace("[]", "");
         }
 
-        SymbolTable.crash("TypeError", this.arrayname + " n'est pas un tableau.");
+        SymbolTable.crash("TypeError", this.arrayname + " is not an array.");
         return "void";
     }
 }

@@ -34,7 +34,7 @@ public class collectiondeclarationnode extends ASTnode {
     @Override
     public String checkSemantics(SymbolTable table) {
         if (!Character.isUpperCase(this.name.charAt(0))) {
-            SymbolTable.crash("collectionError", "the name of collections " + this.name + " must start with a uppercase");
+            SymbolTable.crash("CollectionError", "the name of collections " + this.name + " must start with a uppercase");
         }
 
         table.declareCollection(this.name, this.fields);
