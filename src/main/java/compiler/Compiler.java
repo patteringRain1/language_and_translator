@@ -12,10 +12,10 @@ import java.io.IOException;
 public class Compiler {
     public static void main(String[] args) {
 
-        /*if (args.length < 2) {
+        if (args.length < 2) {
             System.err.println("Usage: java main -lexer|-parser <filepath>");
             System.exit(1);
-        }*/
+        }
         if (args.length == 1) {
             // Inginious：gradle run --args="test.lang"
             String filePath = args[0];

@@ -1,0 +1,6 @@
+def main() {
+  if (true) {
+    INT secret = 42;
+  }
+  secret = 10; # crash : secret exists only in if block
+}

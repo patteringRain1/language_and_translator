@@ -1,0 +1,7 @@
+coll INT {
+  STRING name;
+}
+
+def main() {
+  INT x = 1;
+}

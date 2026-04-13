@@ -1,0 +1,7 @@
+def INT multiply(INT a, INT b) {
+  return a * b;
+}
+
+def main() {
+  INT result = multiply(5, "erreur");
+}

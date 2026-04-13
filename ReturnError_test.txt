@@ -1,0 +1,8 @@
+def INT getScore() {
+  STRING score = "ten";
+  return score;
+}
+
+def main() {
+  getScore();
+}

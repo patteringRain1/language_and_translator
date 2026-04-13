@@ -1,0 +1,7 @@
+def main() {
+  INT age = 20;
+
+  if (age) { # crash : age is not a BOOL
+    age = age + 1;
+  }
+}
