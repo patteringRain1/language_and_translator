@@ -1,6 +1,7 @@
 package compiler.AST.expression;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Codegenerator.Codegenerator;
 import compiler.Semantic.SymbolTable;
 
 // for index access expression of an array or collection
@@ -52,5 +53,25 @@ public class arrayaccessnode extends ASTnode {
 
         SymbolTable.crash("TypeError", this.arrayname + " is not an array.");
         return "void";
+    }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        // for array
+        if (arrayname.equalsIgnoreCase("int") || arrayname.equalsIgnoreCase("float")
+                || arrayname.equalsIgnoreCase("string") || arrayname.equalsIgnoreCase("bool")) {
+            if (indexexpression != null) {
+                indexexpression.generateCode(cg);
+            }
+            // new array
+            cg.emitNewArray(arrayname);
+        } else {
+            cg.emitLoadVar(arrayname);
+            if (indexexpression != null) {
+                indexexpression.generateCode(cg);
+            }
+            String elemType = cg.getArrayElementType(arrayname);
+            cg.emitArrayLoad(elemType);
+        }
     }
 }

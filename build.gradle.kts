@@ -20,6 +20,7 @@ repositories {
 sourceSets.main.get().java.srcDir("src")
 sourceSets.test.get().java.srcDir("test")
 
+
 dependencies {
     // Use JUnit test framework.
     testImplementation("junit:junit:4.13.2")
@@ -27,6 +28,10 @@ dependencies {
 
     // This dependency is used by the application.
     implementation("com.google.guava:guava:31.1-jre")
+
+    // This dependency is used for ASM
+    implementation("org.ow2.asm:asm:9.5")
+    implementation("org.ow2.asm:asm-commons:9.5")
 }
 
 application {

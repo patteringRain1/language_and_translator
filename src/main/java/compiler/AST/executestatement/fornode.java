@@ -1,6 +1,7 @@
 package compiler.AST.executestatement;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Codegenerator.Codegenerator;
 import compiler.Semantic.SymbolTable;
 
 // // for "for" loop statement
@@ -48,5 +49,32 @@ public class fornode extends ASTnode {
         this.body.checkSemantics(table);
 
         return "void";
+    }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        rangenode range = (rangenode) condition;
+        String loopVar = cg.getForLoopVar(initialization);
+        int slot = cg.getOrAllocateVar(loopVar, "int");
+
+        // start with rangenode
+        range.generateRangeStart(cg);
+        cg.emitStore("int", slot);
+
+        // loop
+        org.objectweb.asm.Label loopStart = cg.newLabel();
+        org.objectweb.asm.Label loopEnd = cg.newLabel();
+        cg.markLabel(loopStart);
+
+        cg.emitLoad("int", slot);
+        range.generateRangeEnd(cg);
+        cg.emitJumpIfGreaterOrEqual(loopEnd);
+
+        body.generateCode(cg);
+
+        step_part.generateCode(cg);
+        cg.emitStore("int", slot);
+        cg.emitGoto(loopStart);
+        cg.markLabel(loopEnd);
     }
 }

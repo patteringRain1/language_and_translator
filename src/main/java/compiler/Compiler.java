@@ -1,5 +1,6 @@
 package compiler;
 
+import compiler.Codegenerator.Codegenerator;
 import compiler.Lexer.Lexer;
 import compiler.Lexer.Symbol;
 import compiler.Lexer.TokenType;
@@ -11,36 +12,25 @@ import java.io.IOException;
 
 public class Compiler {
     public static void main(String[] args) {
-
-        if (args.length < 2) {
-            System.err.println("Usage: java main -lexer|-parser <filepath>");
-            System.exit(1);
+        // INGinious
+        if (args.length == 1 && !args[0].startsWith("-")) {
+            runCodeGen(args[0], "test.class");
+            return;
         }
-        if (args.length == 1) {
-            // Inginious：gradle run --args="test.lang"
-            String filePath = args[0];
-            try (FileReader reader = new FileReader(filePath)) {
-                Lexer lexer = new Lexer(reader);
-                Parser parser = new Parser(lexer);
-                ProgramNode root = parser.getAST();
-                SymbolTable table = new SymbolTable();
-                root.checkSemantics(table);
-                root.print(0);
-                System.out.println("Semantic Analysis complete with success !");
-            } catch (IOException e) {
-                System.err.println("Erreur de lecture du fichier : " + e.getMessage());
-            } catch (RuntimeException e) {
-                System.err.println(e.getMessage());
-                System.exit(1);
-            }
 
+        if (args.length == 3 && args[1].equals("-o")) {
+            runCodeGen(args[0], args[2]);
+            return;
         }
-        else if (args.length == 2) {
+
+        // Local
+        if (args.length == 2) {
             String mode = args[0];
             String filePath = args[1];
 
             if (!mode.equals("-lexer") && !mode.equals("-parser")) {
-                System.err.println("Le mode doit être -lexer ou -parser");
+                System.err.println("Unknown mode: " + mode);
+                System.err.println("Usage: -lexer|-parser <filepath>  OR  <filepath> [-o <output.class>]");
                 System.exit(1);
             }
 
@@ -53,7 +43,8 @@ public class Compiler {
                         System.out.println(symbol);
                         symbol = lexer.getNextSymbol();
                     }
-                } else if (mode.equals("-parser")) {
+
+                } else {
                     Parser parser = new Parser(lexer);
                     ProgramNode root = parser.getAST();
                     SymbolTable table = new SymbolTable();
@@ -63,11 +54,51 @@ public class Compiler {
                 }
 
             } catch (IOException e) {
-                System.err.println("Erreur de lecture du fichier : " + e.getMessage());
+                System.err.println("File error: " + e.getMessage());
+                System.exit(1);
             } catch (RuntimeException e) {
                 System.err.println(e.getMessage());
                 System.exit(1);
             }
+            return;
+        }
+
+        // error print
+        System.err.println("Usage:");
+        System.err.println("  <source.lang>                  (code generation, output to test.class)");
+        System.err.println("  <source.lang> -o <out.class>   (code generation, custom output)");
+        System.err.println("  -lexer  <source.lang>          (lexer debug)");
+        System.err.println("  -parser <source.lang>          (parser + semantic debug)");
+        System.exit(1);
+
+    }
+
+    // from Lexer to code generation
+    private static void runCodeGen(String sourceFile, String outputFile) {
+        try (FileReader reader = new FileReader(sourceFile)) {
+
+            // Lexer
+            Lexer lexer = new Lexer(reader);
+
+            // Parser
+            Parser parser = new Parser(lexer);
+            ProgramNode root = parser.getAST();
+
+            // Semantic analysis
+            SymbolTable table = new SymbolTable();
+            root.checkSemantics(table);
+
+            // Code generation
+            Codegenerator cg = new Codegenerator(outputFile);
+            root.generateCode(cg);
+
+        } catch (IOException e) {
+            System.err.println("File error: " + e.getMessage());
+            System.exit(1);
+        } catch (RuntimeException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
         }
     }
+
 }

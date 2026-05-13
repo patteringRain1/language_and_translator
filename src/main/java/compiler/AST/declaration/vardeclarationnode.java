@@ -1,6 +1,7 @@
 package compiler.AST.declaration;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Codegenerator.Codegenerator;
 import compiler.Lexer.Symbol;
 import compiler.Semantic.SymbolTable;
 
@@ -22,6 +23,7 @@ public class vardeclarationnode extends ASTnode {
         this.initialvalue = initialvalue;
     }
 
+    public String getName() { return this.name; }
 
     // print the structure of the variable declaration .
     @Override
@@ -46,5 +48,25 @@ public class vardeclarationnode extends ASTnode {
             }
         }
         return "void";
+    }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        if (this.type.equals("existing_var")) {
+            return;
+        }
+        if (cg.isGlobalScope()) {
+            cg.declareStaticField(this.name, this.type);
+            if (this.initialvalue != null) {
+                this.initialvalue.generateCode(cg);
+                cg.emitPutStatic(this.name, this.type);
+            }
+        } else {
+            int slot = cg.allocateLocalVar(this.name, this.type);
+            if (this.initialvalue != null) {
+                this.initialvalue.generateCode(cg);
+                cg.emitStore(this.type, slot);
+            }
+        }
     }
 }

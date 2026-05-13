@@ -1,6 +1,8 @@
 package compiler.AST.declaration;
 
 import compiler.AST.basic.ASTnode;
+import compiler.AST.expression.literalnode;
+import compiler.Codegenerator.Codegenerator;
 import compiler.Semantic.SymbolTable;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,5 +41,23 @@ public class collectiondeclarationnode extends ASTnode {
 
         table.declareCollection(this.name, this.fields);
         return "void";
+    }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        // collection is created as a separate class in JVM
+        cg.beginCollectionClass(this.name);
+        int k = fields.size();
+        for (int i = 0; i < k; i++) {
+            ASTnode field = fields.get(i);
+            if (field instanceof literalnode) {
+                literalnode f = (literalnode) field;
+                String fieldName = (String) f.getValue();
+                String fieldType = f.getLiteralType().replace("Field: ", "");
+                cg.addCollectionField(fieldName, fieldType);
+            }
+        }
+        // receives all fields as parameters
+        cg.endCollectionClass(this.name, this.fields);
     }
 }

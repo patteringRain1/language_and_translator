@@ -1,6 +1,7 @@
 package compiler.AST.executestatement;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Codegenerator.Codegenerator;
 import compiler.Semantic.SymbolTable;
 
 // assignmenr statement
@@ -35,5 +36,11 @@ public class assignmentnode extends ASTnode {
             SymbolTable.crash("TypeError", "the target has type of " + targetType + " but assigned with " + valueType);
         }
         return "void";
+    }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        value.generateCode(cg);
+        cg.emitAssign(target);
     }
 }

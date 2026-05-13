@@ -12,10 +12,7 @@ import compiler.AST.executestatement.ifelsenode;
 import compiler.AST.executestatement.rangenode;
 import compiler.AST.executestatement.returnnode;
 import compiler.AST.executestatement.whilenode;
-import compiler.AST.expression.arrayaccessnode;
-import compiler.AST.expression.binaryoperationnode;
-import compiler.AST.expression.functioncallnode;
-import compiler.AST.expression.literalnode;
+import compiler.AST.expression.*;
 import compiler.Lexer.Lexer;
 import compiler.Lexer.Symbol;
 import compiler.Lexer.TokenType;
@@ -83,7 +80,15 @@ public class Parser {
       consume(TokenType.LEFT_PAREN);
       node = parseExpression();
       consume(TokenType.RIGHT_PAREN);
-    } else {
+    } else if (type == TokenType.MINUS) {
+      consume(TokenType.MINUS);
+      ASTnode operand = parseFactor();
+      node = new unaryoperationnode("MINUS", operand);
+    } else if (type == TokenType.NOT) {
+      consume(TokenType.NOT);
+      ASTnode operand = parseFactor();
+      node = new unaryoperationnode("NOT", operand);
+    }else {
       throw new RuntimeException("expected expression but recieved : " + type);
     }
 

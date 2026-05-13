@@ -1,6 +1,7 @@
 package compiler.AST.expression;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Codegenerator.Codegenerator;
 import compiler.Semantic.SymbolTable;
 
 // for binary operation expression
@@ -45,5 +46,25 @@ public class unaryoperationnode extends ASTnode {
             return "bool";
         }
         return exprType != null ? exprType : "void";
+    }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        if (expression == null) return;
+        expression.generateCode(cg);
+
+        String op = (operator != null) ? operator : "";
+
+        if (op.equals("MINUS") || op.equals("-")) {
+            String exprType = cg.getExprType(expression);
+            if ("float".equalsIgnoreCase(exprType)) {
+                cg.emitInstruction(org.objectweb.asm.Opcodes.FNEG);
+            } else {
+                cg.emitInstruction(org.objectweb.asm.Opcodes.INEG);
+            }
+        } else if (op.equals("NOT") || op.equals("not")) {
+            cg.emitInstruction(org.objectweb.asm.Opcodes.ICONST_1);
+            cg.emitInstruction(org.objectweb.asm.Opcodes.IXOR);
+        }
     }
 }
