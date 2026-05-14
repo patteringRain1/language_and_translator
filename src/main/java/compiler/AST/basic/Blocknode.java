@@ -1,5 +1,6 @@
 package compiler.AST.basic;
 
+import compiler.Codegenerator.Codegenerator;
 import compiler.Semantic.SymbolTable;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,5 +34,16 @@ public class Blocknode extends ASTnode {
         }
         table.exitScope();
         return "void";
+    }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        int k = statements.size();
+        for (int i = 0; i < k; i++) {
+            ASTnode statement = statements.get(i);
+            if (statement != null) {
+                statement.generateCode(cg);
+            }
+        }
     }
 }

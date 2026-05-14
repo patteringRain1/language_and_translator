@@ -1,6 +1,7 @@
 package compiler.AST.executestatement;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Codegenerator.Codegenerator;
 import compiler.Semantic.SymbolTable;
 
 // for return statement of a function
@@ -33,5 +34,16 @@ public class returnnode extends ASTnode {
             SymbolTable.crash("ReturnError", "waiting for a return type of " + expectedType + " but received " + actualType);
         }
         return "void";
+    }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        if (this.value != null) {
+            this.value.generateCode(cg);
+            String retType = cg.getCurrentReturnType();
+            cg.emitReturn(retType);
+        } else {
+            cg.emitReturn("void");
+        }
     }
 }

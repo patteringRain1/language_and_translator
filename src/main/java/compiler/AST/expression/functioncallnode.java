@@ -1,6 +1,7 @@
 package compiler.AST.expression;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Codegenerator.Codegenerator;
 import compiler.Semantic.SymbolTable;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,6 +95,118 @@ public class functioncallnode extends ASTnode {
 
                 String retType = table.getFunctionReturnType(functionname);
                 return retType != null ? retType.toLowerCase() : functionname;
+            }
+        }
+    }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        int k = arguments.size();
+        switch (functionname) {
+            // System.out.println()
+            case "println": {
+                cg.emitGetStatic("java/lang/System", "out", "Ljava/io/PrintStream;");
+                if (k > 0) {
+                    arguments.get(0).generateCode(cg);
+                    String argType = cg.getExprType(arguments.get(0));
+                    cg.emitInvokeVirtual("java/io/PrintStream", "println",
+                            "(" + cg.typeToDescriptor(argType) + ")V");
+                } else {
+                    cg.emitInvokeVirtual("java/io/PrintStream", "println", "()V");
+                }
+                break;
+            }
+            // System.out.print()
+            case "print": {
+                cg.emitGetStatic("java/lang/System", "out", "Ljava/io/PrintStream;");
+                if (k > 0) {
+                    arguments.get(0).generateCode(cg);
+                    String argType = cg.getExprType(arguments.get(0));
+                    cg.emitInvokeVirtual("java/io/PrintStream", "print",
+                            "(" + cg.typeToDescriptor(argType) + ")V");
+                }
+                break;
+            }
+            //System.out.println(int)
+            case "print_INT": {
+                cg.emitGetStatic("java/lang/System", "out", "Ljava/io/PrintStream;");
+                arguments.get(0).generateCode(cg);
+                cg.emitInvokeVirtual("java/io/PrintStream", "println", "(I)V");
+                break;
+            }
+            //System.out.println(float)
+            case "print_FLOAT": {
+                cg.emitGetStatic("java/lang/System", "out", "Ljava/io/PrintStream;");
+                arguments.get(0).generateCode(cg);
+                cg.emitInvokeVirtual("java/io/PrintStream", "println", "(F)V");
+                break;
+            }
+            // Scanner.nextInt()
+            case "read_INT": {
+                cg.emitReadInt();
+                break;
+            }
+            // Scanner.nextFloat()
+            case "read_FLOAT": {
+                cg.emitReadFloat();
+                break;
+            }
+            // Scanner.nextString()
+            case "read_STRING": {
+                cg.emitReadString();
+                break;
+            }
+            case "length": {
+                arguments.get(0).generateCode(cg);
+                String argType = cg.getExprType(arguments.get(0));
+                if ("string".equalsIgnoreCase(argType)) {
+                    cg.emitInvokeVirtual("java/lang/String", "length", "()I");
+                } else {
+                    cg.emitInstruction(org.objectweb.asm.Opcodes.ARRAYLENGTH);
+                }
+                break;
+            }
+            case "floor": {
+                arguments.get(0).generateCode(cg);
+                cg.emitInvokeStatic("java/lang/Math", "floor", "(D)D");
+                cg.emitInstruction(org.objectweb.asm.Opcodes.D2I);
+                break;
+            }
+            case "ceil": {
+                arguments.get(0).generateCode(cg);
+                cg.emitInvokeStatic("java/lang/Math", "ceil", "(D)D");
+                cg.emitInstruction(org.objectweb.asm.Opcodes.D2I);
+                break;
+            }
+            case "not": {
+                arguments.get(0).generateCode(cg);
+                cg.emitInstruction(org.objectweb.asm.Opcodes.ICONST_1);
+                cg.emitInstruction(org.objectweb.asm.Opcodes.IXOR);
+                break;
+            }
+            case "str": {
+                arguments.get(0).generateCode(cg);
+                cg.emitInvokeStatic("java/lang/String", "valueOf", "(I)Ljava/lang/String;");
+                break;
+            }
+            default: {
+                if (cg.isCollectionConstructor(functionname)) {
+                    cg.emitNew(functionname);
+                    cg.emitInstruction(org.objectweb.asm.Opcodes.DUP);
+                    for (int i = 0; i < k; i++) {
+                        arguments.get(i).generateCode(cg);
+                    }
+                    String constructorDesc = cg.getCollectionConstructorDesc(functionname);
+                    cg.emitInvokeSpecial(functionname, "<init>", constructorDesc);
+                } else {
+                    // static function
+                    for (int i = 0; i < k; i++) {
+                        arguments.get(i).generateCode(cg);
+                    }
+                    String methodDesc = cg.getFunctionDescriptor(functionname);
+                    cg.emitInvokeStatic(cg.getClassName(), functionname, methodDesc);
+                }
+                break;
             }
         }
     }

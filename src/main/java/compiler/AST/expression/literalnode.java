@@ -1,6 +1,7 @@
 package compiler.AST.expression;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Codegenerator.Codegenerator;
 import compiler.Semantic.SymbolTable;
 
 // for literal constant
@@ -80,5 +81,44 @@ public class literalnode extends ASTnode {
 
 
         return "void";
+    }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        String lt = this.literalType.toLowerCase();
+
+        if (lt.equals("integer") || lt.equals("int")) {
+            int val = ((Number) this.value).intValue();
+            cg.emitPushInt(val);
+
+        } else if (lt.equals("float")) {
+            float val = ((Number) this.value).floatValue();
+            cg.emitPushFloat(val);
+
+        } else if (lt.equals("string")) {
+            cg.emitPushString((String) this.value);
+
+        } else if (lt.equals("boolean") || lt.equals("bool")) {
+            boolean val = (Boolean) this.value;
+            cg.emitPushInt(val ? 1 : 0);
+
+        } else if (lt.equals("identifier")) {
+            String varName = (String) this.value;
+            if (cg.isLocalVar(varName)) {
+                int slot = cg.getLocalVarSlot(varName);
+                String type = cg.getLocalVarType(varName);
+                cg.emitLoad(type, slot);
+            } else {
+                String type = cg.getStaticFieldType(varName);
+                cg.emitGetStatic(cg.getClassName(), varName, cg.typeToDescriptor(type));
+            }
+
+        } else if (lt.equals("fieldaccess")) {
+            String fullName = (String) this.value;
+            cg.emitFieldAccess(fullName);
+
+        } else {
+            // no need to create values
+        }
     }
 }

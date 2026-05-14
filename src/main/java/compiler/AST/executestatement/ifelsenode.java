@@ -1,6 +1,7 @@
 package compiler.AST.executestatement;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Codegenerator.Codegenerator;
 import compiler.Lexer.Symbol;
 import compiler.Semantic.SymbolTable;
 
@@ -54,4 +55,27 @@ public class ifelsenode extends ASTnode {
         }
         return "void";
     }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        condition.generateCode(cg);
+
+        org.objectweb.asm.Label elseLabel = cg.newLabel();
+        org.objectweb.asm.Label endLabel = cg.newLabel();
+
+        // if false then jump
+        cg.emitJumpIfFalse(elseLabel);
+
+        // if block
+        ifblock.generateCode(cg);
+        cg.emitGoto(endLabel);
+
+        // else block
+        cg.markLabel(elseLabel);
+        if (elseblock != null) {
+            elseblock.generateCode(cg);
+        }
+        cg.markLabel(endLabel);
+    }
+
 }

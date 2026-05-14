@@ -1,6 +1,7 @@
 package compiler.AST.declaration;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Codegenerator.Codegenerator;
 import compiler.Semantic.SymbolTable;
 import java.util.List;
 
@@ -63,5 +64,23 @@ public class functiondeclarationnode extends ASTnode {
         table.setCurrentReturnType(previousType);
         table.exitScope();
         return "void";
+    }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        // public static void main(String[] args)
+        if (this.name.equals("main")) {
+            cg.beginMainMethod();
+            if (body != null) {
+                body.generateCode(cg);
+            }
+            cg.endMainMethod();
+        } else {
+            cg.beginMethod(this.name, this.returnType, this.paramTypes, this.paramNames);
+            if (body != null) {
+                body.generateCode(cg);
+            }
+            cg.endMethod(this.returnType);
+        }
     }
 }

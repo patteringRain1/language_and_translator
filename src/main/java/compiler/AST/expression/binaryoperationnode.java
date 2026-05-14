@@ -1,6 +1,7 @@
 package compiler.AST.expression;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Codegenerator.Codegenerator;
 import compiler.Semantic.SymbolTable;
 
 public class binaryoperationnode extends ASTnode {
@@ -78,5 +79,66 @@ public class binaryoperationnode extends ASTnode {
         }
 
         return "void";
+    }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        // left operand and right operand
+        left.generateCode(cg);
+        right.generateCode(cg);
+
+        String op = (operator != null) ? operator : "";
+        String leftType = cg.getExprType(left);
+
+        // binary operation
+        if (op.equals("PLUS") || op.equals("+")) {
+            if ("string".equalsIgnoreCase(leftType)) {
+                cg.emitStringConcat();
+            } else if ("float".equalsIgnoreCase(leftType)) {
+                cg.emitInstruction(org.objectweb.asm.Opcodes.FADD);
+            } else {
+                cg.emitInstruction(org.objectweb.asm.Opcodes.IADD);
+            }
+        } else if (op.equals("MINUS") || op.equals("-")) {
+            if ("float".equalsIgnoreCase(leftType)) {
+                cg.emitInstruction(org.objectweb.asm.Opcodes.FSUB);
+            } else {
+                cg.emitInstruction(org.objectweb.asm.Opcodes.ISUB);
+            }
+        } else if (op.equals("TIMES") || op.equals("*")) {
+            if ("float".equalsIgnoreCase(leftType)) {
+                cg.emitInstruction(org.objectweb.asm.Opcodes.FMUL);
+            } else {
+                cg.emitInstruction(org.objectweb.asm.Opcodes.IMUL);
+            }
+        } else if (op.equals("DIVIDE") || op.equals("/")) {
+            if ("float".equalsIgnoreCase(leftType)) {
+                cg.emitInstruction(org.objectweb.asm.Opcodes.FDIV);
+            } else {
+                cg.emitInstruction(org.objectweb.asm.Opcodes.IDIV);
+            }
+        } else if (op.equals("MODULO") || op.equals("%")) {
+            cg.emitInstruction(org.objectweb.asm.Opcodes.IREM);
+        }
+        // comparison operator
+        else if (op.equals("EQUALS") || op.equals("==")) {
+            cg.emitComparison("==", leftType);
+        } else if (op.equals("NOT_EQUALS") || op.equals("=/=")) {
+            cg.emitComparison("!=", leftType);
+        } else if (op.equals("LESS_THAN") || op.equals("<")) {
+            cg.emitComparison("<", leftType);
+        } else if (op.equals("LESS_THAN_OR_EQUALS") || op.equals("<=")) {
+            cg.emitComparison("<=", leftType);
+        } else if (op.equals("GREATER_THAN") || op.equals(">")) {
+            cg.emitComparison(">", leftType);
+        } else if (op.equals("GREATER_THAN_OR_EQUALS") || op.equals(">=")) {
+            cg.emitComparison(">=", leftType);
+        }
+        // logistic operator
+        else if (op.equals("AND") || op.equals("&&")) {
+            cg.emitInstruction(org.objectweb.asm.Opcodes.IAND);
+        } else if (op.equals("OR") || op.equals("||")) {
+            cg.emitInstruction(org.objectweb.asm.Opcodes.IOR);
+        }
     }
 }

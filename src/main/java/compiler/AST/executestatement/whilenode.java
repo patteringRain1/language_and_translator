@@ -1,6 +1,7 @@
 package compiler.AST.executestatement;
 
 import compiler.AST.basic.ASTnode;
+import compiler.Codegenerator.Codegenerator;
 import compiler.Semantic.SymbolTable;
 
 // for while loop statement
@@ -37,5 +38,22 @@ public class whilenode extends ASTnode {
         this.body.checkSemantics(table);
         table.exitScope();
         return "void";
+    }
+
+    @Override
+    public void generateCode(Codegenerator cg) {
+        org.objectweb.asm.Label loopStart = cg.newLabel();
+        org.objectweb.asm.Label loopEnd = cg.newLabel();
+        cg.markLabel(loopStart);
+        condition.generateCode(cg);
+
+        // if false the end the loop
+        cg.emitJumpIfFalse(loopEnd);
+
+        body.generateCode(cg);
+
+        // loop start
+        cg.emitGoto(loopStart);
+        cg.markLabel(loopEnd);
     }
 }
