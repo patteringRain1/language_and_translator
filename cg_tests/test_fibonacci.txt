@@ -1,0 +1,12 @@
+def INT fibonacci(INT n) {
+    if (n <= 1) {
+        return n;
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+def main() {
+    print("Fibonacci de 6 : ");
+    print_INT(fibonacci(6)); #it has to be 8
+    println("");
+}

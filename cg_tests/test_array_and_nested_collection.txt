@@ -1,0 +1,22 @@
+coll Stats {
+    INT[] history;
+}
+
+def main() {
+    INT[] distances = INT ARRAY [3];
+    distances[0] = 5;
+    distances[1] = 10;
+    distances[2] = 15;
+
+    Stats runData = Stats(distances);
+
+    INT total = 0;
+    INT i;
+    for (i; 0 -> 2; i + 1) {
+        total = total + runData.history[i];
+    }
+
+    print("Total distance : ");
+    print_INT(total); #has to be 30
+    println("");
+}

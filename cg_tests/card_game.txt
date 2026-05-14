@@ -1,0 +1,36 @@
+coll Card {
+    STRING name;
+    INT damage;
+    BOOL isMagic;
+}
+
+coll Player {
+    INT hp;
+    Card[] deck;
+}
+
+def INT calculateDamage(Card c, BOOL enemyResistsMagic) {
+    if (c.isMagic && enemyResistsMagic) {
+        return c.damage / 2;
+    }
+    return max(0, c.damage);
+}
+
+def main() {
+    Card fireball = Card("Fireball", 10, true);
+    Card sword = Card("Iron Sword", 6, false);
+
+    Card[] myDeck = Card ARRAY [2];
+    myDeck[0] = fireball;
+    myDeck[1] = sword;
+
+    Player hero = Player(20, myDeck);
+
+    print("damage of card 0 on an ennemy : ");
+    print_INT(calculateDamage(hero.deck[0], true)); #has to be 5
+    println("");
+    print("the minimum number between 2 and 4 is : ");
+    INT value = min(2, 4);
+    print_INT(value);
+    println("");
+}
